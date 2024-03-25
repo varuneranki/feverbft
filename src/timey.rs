@@ -6,3 +6,20 @@
 
 //use std::time::Instant;
 //https://users.rust-lang.org/t/high-accuracy-timer/29019/11
+
+/*use std::time::{Instant, Duration};
+
+fn main() {
+    // Get the current time as an Instant
+    let now = Instant::now();
+
+    // Convert the Instant to a duration since the epoch (time since system startup)
+    let elapsed_duration = now.elapsed();
+
+    // Extract seconds and nanoseconds from the duration
+    let seconds = elapsed_duration.as_secs();
+    let nanoseconds = elapsed_duration.subsec_nanos();
+
+    println!("Current system time (seconds): {}", seconds);
+    println!("Current system time (nanoseconds): {}", nanoseconds);
+}*/
