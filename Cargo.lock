@@ -376,7 +376,9 @@ name = "feverbft"
 version = "0.1.0"
 dependencies = [
  "libp2p",
+ "libp2p-mdns",
  "tokio",
+ "zeroize",
 ]
 
 [[package]]

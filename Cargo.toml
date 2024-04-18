@@ -3,12 +3,15 @@ name = "feverbft"
 version = "0.1.0"
 edition = "2021"
 
+[bin]
+feverbft = "main.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 tokio = { version = "1.x", features = ["full"] }
 
-[dependencies.libp2p]
-version = "0.x"
-features = ["mdns"]
+libp2p = { version = "0.53.2", features = ["mdns"] }
+libp2p-mdns = "0.45.1"
+zeroize = "1.7.0"
 
