@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  peer:
+    build: .
+    networks:
+      - peer-server_default
+    deploy:
+      mode: replicated
+      replicas: 6
+    
+
+networks:
+  peer-server_default:
+    external: true

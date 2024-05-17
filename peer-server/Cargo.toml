@@ -1,0 +1,26 @@
+[package]
+name = "peer-server"
+version = "0.1.11"
+edition = "2021"
+
+#version 0.1.0 dependncies
+[dependencies]
+axum = "0.6.6"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+
+
+
+#[dependencies]
+#axum = "0.6.6"
+#serde = { version = "1.0", features = ["derive"] }
+#serde_json = "1.0"
+#futures = "0.3"
+#libp2p = { version = "0.53.2", features = [ "tokio", "gossipsub", "mdns", "noise", "macros", "tcp", "yamux", "quic"] }
+#tokio = { version = "1", features = ["full"] }
+#tracing = "0.1"
+#tracing-futures = "0.2"
+#tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+#async-trait = "0.1"
+#log = "0.4"
