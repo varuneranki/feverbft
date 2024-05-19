@@ -4,9 +4,6 @@ use std::error::Error;
 use std::time::Duration;
 use tokio::{io, io::AsyncBufReadExt, select};
 use tracing_subscriber::EnvFilter;
-use chrono::{NaiveDateTime, Timelike};
-
-mod clocky;
 
 // We create a custom network behaviour that combines Gossipsub and Mdns.
 #[derive(NetworkBehaviour)]
@@ -50,11 +47,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .with_swarm_config(|c| c.with_idle_connection_timeout(Duration::from_secs(60)))
         .build();
 
-    // Start synchronization of logical clock
-    tokio::spawn(async move {
-        clocky::synchronize_logical_clock();
-    });
-    
     // Create a Gossipsub topic
     let topic = gossipsub::IdentTopic::new("test-net");
     // Subscribe to our topic
@@ -73,18 +65,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     loop {
         select! {
             Ok(Some(line)) = stdin.next_line() => {
-            	    tokio::spawn(async move {
-        		clocky::synchronize_logical_clock();
-   		});
-            
-            		
-             	 let logical_clock_time = clocky::current_logical_clock_time();
-           	 let message_with_time = format!("<{}> {}", logical_clock_time, line.trim());
-           	 
-           	 println!("{}",message_with_time);
-                 if let Err(e) = swarm
+                if let Err(e) = swarm
                     .behaviour_mut().gossipsub
-                    .publish(topic.clone(), message_with_time.as_bytes()) {
+                    .publish(topic.clone(), line.as_bytes()) {
                     println!("Publish error: {e:?}");
                 }
             }
@@ -105,15 +88,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     propagation_source: peer_id,
                     message_id: id,
                     message,
-                })) => {
-                    tokio::spawn(async move {
-       		 clocky::synchronize_logical_clock();
-    			});
-                    let current_time = clocky::current_logical_clock_time();
-                    let message_str = String::from_utf8_lossy(&message.data).trim().to_string();
-                    
-                    println!("Got message: '{}' at '{}' with id: {id} from peer: {peer_id}", message_str, current_time, id = id, peer_id = peer_id);
-                },
+                })) => println!(
+                        "Got message: '{}' with id: {id} from peer: {peer_id}",
+                        String::from_utf8_lossy(&message.data),
+                    ),
                 SwarmEvent::NewListenAddr { address, .. } => {
                     println!("Local node is listening on {address}");
                 }
@@ -122,3 +100,53 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 }
+
+
+//////experimental code////////
+/*
+
+// Generated Event Enum
+impl libp2p::swarm::NetworkBehaviourEventProcess<mdns::Event> for MyBehaviour {
+    fn inject_event(&mut self, event: mdns::Event) {
+        match event {
+            mdns::Event::Discovered(peers) => {
+                for (peer_id, _) in peers {
+                    println!("Discovered peer: {:?}", peer_id);
+                    self.gossipsub.add_explicit_peer(&peer_id);
+                }
+            }
+            mdns::Event::Expired(peers) => {
+                for (peer_id, _) in peers {
+                    println!("Expired peer: {:?}", peer_id);
+                    self.gossipsub.remove_explicit_peer(&peer_id);
+                }
+            }
+        }
+    }
+}
+
+impl libp2p::swarm::NetworkBehaviourEventProcess<gossipsub::Event> for MyBehaviour {
+    fn inject_event(&mut self, event: gossipsub::Event) {
+        if let gossipsub::Event::Message {
+            propagation_source,
+            message_id,
+            message,
+        } = event
+        {
+            println!(
+                "Got message: '{}' with id: {} from peer: {}",
+                String::from_utf8_lossy(&message.data),
+                message_id,
+                propagation_source
+            );
+        }
+    }
+}
+
+
+*/
+//////////////////////////////
+
+
+
+

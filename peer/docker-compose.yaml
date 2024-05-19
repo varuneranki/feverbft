@@ -2,12 +2,12 @@ version: '3'
 
 services:
   peer:
-    build: .
+    image: peer_v7:latest
     networks:
       - peer-server_default
     deploy:
       mode: replicated
-      replicas: 6
+      replicas: 2
     
 
 networks:
