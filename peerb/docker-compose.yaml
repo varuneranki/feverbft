@@ -2,7 +2,7 @@ version: '3'
 
 services:
   peer:
-    image: peer:latest
+    image: peerb:latest
     networks:
       - peer-server_default
     deploy:

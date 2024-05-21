@@ -15,8 +15,6 @@ use tracing_subscriber::EnvFilter;
 
 mod clocky;
 
-const BYZANTINE: u8 = 0; // Change this to 1 to enable Byzantine behavior
-
 // We create a custom network behaviour that combines Gossipsub and Mdns.
 #[derive(NetworkBehaviour)]
 struct MyBehaviour {
@@ -70,19 +68,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Listen on all interfaces and whatever port the OS assigns
     swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
     swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
-    
-    tokio::spawn(async move {
-        clocky::start_logical_clock().await;
-    });
-
-    tokio::spawn(async move {
-        let mut interval = tokio::time::interval(Duration::from_secs(3600));
-        loop {
-            interval.tick().await;
-            clocky::synchronize_logical_clock();
-        }
-    });
-
 
     println!("Enter messages via STDIN and they will be sent to connected peers using Gossipsub");
 
@@ -123,24 +108,16 @@ async fn handle_event(
             message_id: id,
             message,
         })) => {
-        	clocky::synchronize_logical_clock();
-               let current_time = clocky::current_logical_clock_time();
             let message_str = String::from_utf8_lossy(&message.data).trim().to_string();
-            println!("Got message: '{}' at '{}' with id: {} from peer: {}", message_str, current_time, id, peer_id);
+            println!("Got message: '{}' with id: {id} from peer: {peer_id}", message_str);
 
-            if message_str == "START ATTACK" || message_str == "START RETREAT" {
-                if BYZANTINE == 0 {
-                    if message_str == "START ATTACK" {
-                        send_message(swarm, "ATTACK").await;
-                    } else if message_str == "START RETREAT" {
-                        send_message(swarm, "RETREAT").await;
-                    }
-                } else if BYZANTINE == 1 {
-                    let response = if random::<bool>() { "ATTACK" } else { "RETREAT" };
-                    send_message(swarm, response).await;
-                }
-
-                let (attack_count, retreat_count) = count_messages(swarm, 5000).await;
+            if message_str == "START ATTACK" {
+                send_message(swarm, "ATTACK").await;
+                let (attack_count, retreat_count) = count_messages(swarm, 100).await;
+                print_consensus(attack_count, retreat_count);
+            } else if message_str == "START RETREAT" {
+                send_message(swarm, "RETREAT").await;
+                let (attack_count, retreat_count) = count_messages(swarm, 100).await;
                 print_consensus(attack_count, retreat_count);
             }
         }
@@ -150,7 +127,6 @@ async fn handle_event(
         _ => {}
     }
 }
-
 
 async fn send_message(
     swarm: &mut libp2p::Swarm<MyBehaviour>,
@@ -197,14 +173,11 @@ async fn count_messages(
 }
 
 fn print_consensus(attack_count: u32, retreat_count: u32) {
-    clocky::synchronize_logical_clock();
-               let current_time = clocky::current_logical_clock_time();
     let consensus = if attack_count > retreat_count {
         "ATTACK"
     } else {
         "RETREAT"
     };
-    
-    println!("End of Consensus Result at {}: {}", current_time, consensus);
+    println!("End of Consensus Result: {}", consensus);
 }
 

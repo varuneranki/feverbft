@@ -15,7 +15,7 @@ use tracing_subscriber::EnvFilter;
 
 mod clocky;
 
-const BYZANTINE: u8 = 0; // Change this to 1 to enable Byzantine behavior
+const BYZANTINE: u8 = 1; // Change this to 1 to enable Byzantine behavior
 
 // We create a custom network behaviour that combines Gossipsub and Mdns.
 #[derive(NetworkBehaviour)]
@@ -136,8 +136,13 @@ async fn handle_event(
                         send_message(swarm, "RETREAT").await;
                     }
                 } else if BYZANTINE == 1 {
-                    let response = if random::<bool>() { "ATTACK" } else { "RETREAT" };
-                    send_message(swarm, response).await;
+                    if message_str == "START ATTACK" {
+                        send_message(swarm, "RETREAT").await;
+                    } else if message_str == "START RETREAT" {
+                        send_message(swarm, "ATTACK").await;
+                    }
+                    //let response = if random::<bool>() { "ATTACK" } else { "RETREAT" };
+                    //send_message(swarm, response).await;
                 }
 
                 let (attack_count, retreat_count) = count_messages(swarm, 5000).await;
