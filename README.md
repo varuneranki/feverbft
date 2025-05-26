@@ -61,3 +61,6 @@ Observations: peers repeat the same instruction to ATTACK or RETREAT when the le
 ![6 non byzantine peers and 6 byzantine peers](../../blob/master/images/6peer6peerb.png)
 consensus of 6 non byzantine peers and 6 byzantine peers
 
+# Stopping the nodes
+`docker compose down` with the container name would gracefully shutdown the peer, peerb and peer-server instances. Or simple `Strong/Ctrl+C` would shutdown the containers. But always follow the process of shutting down the peers before the server as the docker network configuration is managed by the server instance. 
+
