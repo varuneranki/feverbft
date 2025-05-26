@@ -4,7 +4,7 @@ This project is part of the implementation for Master Thesis on the topic "FEVER
 
 # Implementation
 ## Build your Time-keeping device
-![Raspberry Pi3 (left) and BeagleBone Black Wireless (right) with ubox NEO-6M gps modules](https://github.com/varuneranki/feverbft/blob/master/images/RaspiGPS-min.jpeg | width=60)
+![Raspberry Pi3 (left) and BeagleBone Black Wireless (right) with ubox NEO-6M gps modules](../../blob/master/images/RaspiGPS-min.jpeg)
 Raspberry Pi3 (left) and BeagleBone Black Wireless (right) with ubox NEO-6M gps modules
 
 It requires one or more Time-keeping servers based on the accuracy requirements. Alternatively if less accuracy is enough, select your nearest NTP public servers (Network Time Protocol) and configure it in the `simple_get_time()` function in the `clocky.rs` file for all instances of peers (`peer-server, peer, peerb`).
@@ -44,7 +44,7 @@ peer displays normal, non-byzantine behavior while peerb displays abnormal, byza
 
 Open a new terminal for each block and navigate to the inner folder structure for both and build the respective docker files. Use `docker-compose up` command to run instances of peer and peerb nodes. The number of nodes is configured in the respective docker compose files `docker-compose.yaml`. **Do not forget to save the compose file after making the changes.**
 
-![configuration of peer and peerb](https://github.com/varuneranki/feverbft/blob/master/images/configuration.png)
+![configuration of peer and peerb](../../blob/master/images/configuration.png)
 configuration of 6 non byzantine peers and 6 byzantine peers
 
 # Performing the consensus
@@ -58,6 +58,6 @@ YOU HAVE TO CHOOSE A LEADER: Use the docker UI and randomly open one of the runn
 
 Observations: peers repeat the same instruction to ATTACK or RETREAT when the leader instructs. Byzantine peers randomly decide to ATTACK or RETREAT irrespective of what the leader isntructs. For artifical test purposes, all instances of peerb respond with opposite of the leader's instruction. 
 
-![6 non byzantine peers and 6 byzantine peers](https://github.com/varuneranki/feverbft/blob/master/images/6peer6peerb.png)
+![6 non byzantine peers and 6 byzantine peers](../../blob/master/images/6peer6peerb.png)
 consensus of 6 non byzantine peers and 6 byzantine peers
 
